@@ -1,7 +1,9 @@
-import { SVG, Svg, Path } from '@svgdotjs/svg.js'
+import { SVG, Svg, Path, G } from '@svgdotjs/svg.js'
 import '@svgdotjs/svg.draggable.js'
 import Mousetrap from 'mousetrap'
 import _ from 'lodash';
+
+const electronAPI = window.electronAPI
 
 console.log('Hello world!111');
 
@@ -82,22 +84,65 @@ class MindCanvas implements IMindCanvas {
         this.edgeIdMap = new Map()
         this.status = {}
     }
+    reset(uiData: IData) {
+        this.draw.clear()
+
+        this.uiData = uiData
+
+        this.config = {
+            node: {
+                width: 200,
+                height: 100,
+                margin: {
+                    height: 200,
+                    width: 300,
+                }
+            }
+        }
+        this.uiDateIdMap.clear()
+        this.edgeFromMap.clear()
+        this.edgeToMap.clear()
+        this.uiEdgeMap.clear()
+        this.edgeIdMap.clear()
+        this.status = {}
+    }
     setup() {
         console.log("setup")
         let status = this.status
         let uiDateIdMap = this.uiDateIdMap
         let drawNode = this.drawNode.bind(this)
         let drawEdges = this.drawEdges.bind(this)
+        let reset = this.reset.bind(this)
+        let setup = this.setup.bind(this)
 
         this.status['currentId'] = 0
         let x = window.innerWidth
         let y = window.innerHeight
-        this.draw = SVG().addTo('body').size(x, y)
+        if (this.draw === undefined)
+            this.draw = SVG().addTo('body').size(x, y)
 
         this.drawNode(this.uiData.node)
         this.drawEdges(this.uiData.edges)
 
-        Mousetrap.bind('4', function () { console.log('4'); });
+        Mousetrap.bind('4', function (e) {
+            console.log('4');
+        });
+
+        Mousetrap.bind(['ctrl+s', 'command+s'], function (e) {
+            // console.log(JSON.stringify(uiData))
+            console.log(e);
+            electronAPI.save(JSON.stringify(uiData))
+        });
+        Mousetrap.bind(['ctrl+o', 'command+o'], function (e) {
+            console.log(e);
+            electronAPI.open().then(result => {
+                console.log(result)
+                reset(result)
+                setup()
+            }).catch(err => {
+                console.log(err)
+            })
+        });
         Mousetrap.bind('enter', function () {
             console.log(JSON.stringify(uiData))
             console.log('enter');
@@ -194,7 +239,7 @@ class MindCanvas implements IMindCanvas {
                 var input = SVG('<input id="n' + uiNode.id + '" type="text" value="' + text + '">')
                 foreignObject.add(input)
 
-                var inputDom = <HTMLInputElement> document.getElementById("n" + uiNode.id)
+                var inputDom = <HTMLInputElement>document.getElementById("n" + uiNode.id)
                 inputDom.focus()
                 inputDom.setSelectionRange(inputDom.value.length, inputDom.value.length);
 
@@ -296,6 +341,7 @@ var uiData: IData = {
     }]
 }
 // var uiData: IData = {"node":{"id":0,"label":"中心节点","x":640,"y":245.5,"children":[{"id":1,"label":"中心节点","x":940,"y":245.5,"children":[{"id":1647827739598,"label":"新节点","x":1241,"y":106.5,"children":[]},{"id":1647827742023,"label":"新节点","x":1238,"y":299.5,"children":[]}]}]},"edges":[{"id":2,"from":0,"to":1},{"id":1647827739599,"from":1,"to":1647827739598},{"id":1647827742023,"from":1,"to":1647827742023}]}
+// var uiData: IData = { "node": { "id": 0, "label": "中心节点", "x": 261.3333333333333, "y": 270.5, "children": [{ "id": 1, "label": "中心节点", "x": 561.3333333333333, "y": 270.5, "children": [] }] }, "edges": [{ "id": 2, "from": 0, "to": 1 }] }
 
 const mindCanvas = new MindCanvas(uiData);
 mindCanvas.setup()

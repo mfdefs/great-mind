@@ -12,7 +12,8 @@
     "resolveJsonModule": true,
     "paths": {
       "*": ["node_modules/*"]
-    }
+    },
+    "downlevelIteration": true,
   },
   "include": ["src/**/*"]
 }
