@@ -140,7 +140,7 @@ class MindCanvas implements IMindCanvas {
                 reset(result)
                 setup()
             }).catch(err => {
-                console.log(err)
+                console.error(err)
             })
         });
         Mousetrap.bind('enter', function () {
@@ -236,7 +236,8 @@ class MindCanvas implements IMindCanvas {
                 console.log(uiNode)
                 planin.remove()
                 var foreignObject = g.foreignObject(200, 100).center(uiNode.x, uiNode.y)
-                var input = SVG('<input id="n' + uiNode.id + '" type="text" value="' + text + '">')
+                // @ts-ignore
+                var input = SVG('<input id="n' + uiNode.id + '" type="text" value="' + text + '">', true)
                 foreignObject.add(input)
 
                 var inputDom = <HTMLInputElement>document.getElementById("n" + uiNode.id)

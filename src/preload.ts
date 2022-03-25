@@ -38,13 +38,13 @@ var electronAPI: IElectronAPI = {
         let result = ipcRenderer.sendSync('asynchronous-open', 'ping')
         console.log(result)
         return new Promise((resolve, reject) => {
-            fs.readFile(JSON.parse(result), 'utf8', (err, data) => {
+            fs.readFile(result, 'utf8', (err, data) => {
                 if (err) {
                     console.error(err)
                     return
                 }
                 console.log(data)
-                resolve(data)
+                resolve(JSON.parse(data))
             })
         })
     },
