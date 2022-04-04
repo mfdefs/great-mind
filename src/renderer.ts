@@ -108,6 +108,9 @@ class MindCanvas implements IMindCanvas {
     }
     setup() {
         console.log("setup")
+
+        uiData = this.uiData;
+
         let status = this.status
         let uiDateIdMap = this.uiDateIdMap
         let drawNode = this.drawNode.bind(this)
@@ -161,7 +164,7 @@ class MindCanvas implements IMindCanvas {
 
             let newNode: IUiNode = {
                 id: new Date().getTime(),
-                label: "新节点",
+                label: "New Node",
                 // x: window.innerWidth / 2,
                 x: currentNode.x + 300,
                 y: currentNode.y,
@@ -224,9 +227,9 @@ class MindCanvas implements IMindCanvas {
 
         let status = this.status
 
-        g.rect(200, 100).attr({ fill: '#f06' }).center(uiNode.x, uiNode.y)
+        g.rect(200, 80).attr({ fill: '#f06' }).center(uiNode.x, uiNode.y)
 
-        var text = 'grouped draggable'
+        var text = uiNode.label == 'undefined' ? 'New Node' : uiNode.label
         var planin = g.plain(text).center(uiNode.x, uiNode.y)
 
         g.attr('uiNodeId', uiNode.id),
@@ -247,7 +250,8 @@ class MindCanvas implements IMindCanvas {
                 foreignObject.on('keydown', function (e: any) {
                     if (e.key === "Enter") {
                         text = e.target.value
-                        planin = g.plain(e.target.value).center(uiNode.x, uiNode.y)
+                        planin = g.plain(text).center(uiNode.x, uiNode.y)
+                        uiNode.label = text;
                         foreignObject.remove()
                     }
                 })
@@ -255,7 +259,8 @@ class MindCanvas implements IMindCanvas {
                 foreignObject.on('focusout', function (e: any) {
                     console.log(e)
                     text = e.target.value
-                    planin = g.plain(e.target.value).center(uiNode.x, uiNode.y)
+                    planin = g.plain(text).center(uiNode.x, uiNode.y)
+                    uiNode.label = text;
                     foreignObject.remove()
                 })
             })
@@ -317,13 +322,13 @@ class MindCanvas implements IMindCanvas {
 
 var uiNode: IUiNode = {
     id: 0,
-    label: "中心节点",
+    label: "Parent Node",
     // x: window.innerWidth / 2,
     x: window.innerWidth * 1 / 3,
     y: window.innerHeight / 2,
     children: [{
         id: 1,
-        label: "中心节点",
+        label: "Child Node",
         // x: window.innerWidth / 2,
         x: window.innerWidth * 1 / 3 + 300,
         y: window.innerHeight / 2,
